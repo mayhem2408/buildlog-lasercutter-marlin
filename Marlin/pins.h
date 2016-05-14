@@ -369,12 +369,18 @@
     #define Y_MIN_PIN          14
     #define Y_MAX_PIN          15
 
+    // Y2 Driver is the unused E1 Driver
+    #define Y2_STEP_PIN        36  
+    #define Y2_DIR_PIN         34
+    #define Y2_ENABLE_PIN      30
+
     #define Z_STEP_PIN         46
     #define Z_DIR_PIN          48
     #define Z_ENABLE_PIN       62
     #define Z_MIN_PIN          18
     #define Z_MAX_PIN          19
 
+    // Z2 Driver is the unused E1 Driver
     #define Z2_STEP_PIN        36
     #define Z2_DIR_PIN         34
     #define Z2_ENABLE_PIN      30
@@ -391,22 +397,23 @@
     #define SDSS               53
     #define LED_PIN            13
 
-  #if LASER_CONTROL == 1
+	#if LASER_CONTROL == 1
       #define LASER_FIRING_PIN    5
     #endif
-  #if LASER_CONTROL == 2
+	#if LASER_CONTROL == 2
       #define LASER_INTENSITY_PIN 6 // Digital pins 2, 3, 5, 6, 7, 8 are attached to timers we can use
       #define LASER_FIRING_PIN  5
-  #endif
-  #ifdef LASER_POWER_DOWN
-    #define LASER_POWER_PIN 9 // This is currently hard-coded to timer2 which services pins 9, 10
-  #endif // LASER_POWER_DOWN
-  #ifdef LASER_PERIPHERALS
-    #define LASER_COOLANT       64
-    #define LASER_AIR           40
-    #define LASER_POWER         44
-    #define LASER_EXHAUST       42
-  #endif // LASER_PERIPHERALS
+    #endif
+    #ifdef LASER_POWER_DOWN
+      #define LASER_POWER_PIN 9 // This is currently hard-coded to timer2 which services pins 9, 10
+    #endif // LASER_POWER_DOWN
+    #ifdef LASER_PERIPHERALS
+      #define LASER_COOLANT       64
+      #define LASER_AIR           40
+      #define LASER_POWER         44
+      #define LASER_EXHAUST       42
+	  #define LASER_PERIPHERALS_STATUS_PIN	11
+    #endif // LASER_PERIPHERALS
 
   #endif
 
@@ -496,11 +503,11 @@
       #define LCD_PINS_D7 29
 
       #ifdef REPRAP_DISCOUNT_SMART_CONTROLLER
-        #define BEEPER 37
+        #define BEEPER -1 //37 
 
-        #define BTN_EN1 31
+        #define BTN_EN1 31  // Reverse EN1 and EN2 if the encoder turns in the wrong direction
         #define BTN_EN2 33
-        #define BTN_ENC 35
+        #define BTN_ENC 35  // Push Button
 
         #define SDCARDDETECT 49
       #elif defined(LCD_I2C_PANELOLU2)
