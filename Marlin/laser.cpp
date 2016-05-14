@@ -152,24 +152,45 @@ void laser_fire(int intensity = 100.0) {
     if (intensity < 0) intensity = 0;
 
     #if LASER_CONTROL == 1
-      #if LASER_FIRING_PIN == 2
-        OCR3B = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
-      #endif    
-      #if LASER_FIRING_PIN == 3
-        OCR3C = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
-      #endif    
-      #if LASER_FIRING_PIN == 5
-        OCR3A = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
-      #endif
-      #if LASER_FIRING_PIN == 6
-        OCR4A = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
-      #endif    
-      #if LASER_FIRING_PIN == 7
-        OCR4B = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
-      #endif    
-      #if LASER_FIRING_PIN == 8
-        OCR4C = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
-      #endif
+	  #ifdef HIGH_TO_FIRE
+        #if LASER_FIRING_PIN == 2
+          OCR3B = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
+        #endif    
+        #if LASER_FIRING_PIN == 3
+          OCR3C = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
+        #endif    
+        #if LASER_FIRING_PIN == 5
+          OCR3A = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
+        #endif
+        #if LASER_FIRING_PIN == 6
+          OCR4A = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
+        #endif    
+        #if LASER_FIRING_PIN == 7
+          OCR4B = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
+        #endif    
+        #if LASER_FIRING_PIN == 8
+          OCR4C = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
+        #endif
+	  #else
+        #if LASER_FIRING_PIN == 2
+          OCR3B = labs(((100 - intensity) / 100.0)*(F_CPU / LASER_PWM));
+        #endif    
+        #if LASER_FIRING_PIN == 3
+          OCR3C = labs(((100 - intensity) / 100.0)*(F_CPU / LASER_PWM));
+        #endif    
+        #if LASER_FIRING_PIN == 5
+          OCR3A = labs(((100 - intensity) / 100.0)*(F_CPU / LASER_PWM));
+        #endif
+        #if LASER_FIRING_PIN == 6
+          OCR4A = labs(((100 - intensity) / 100.0)*(F_CPU / LASER_PWM));
+        #endif    
+        #if LASER_FIRING_PIN == 7
+          OCR4B = labs(((100 - intensity) / 100.0)*(F_CPU / LASER_PWM));
+        #endif    
+        #if LASER_FIRING_PIN == 8
+          OCR4C = labs(((100 - intensity) / 100.0)*(F_CPU / LASER_PWM));
+        #endif
+	  #endif	
     #endif
 
     #if LASER_CONTROL == 2
@@ -191,7 +212,7 @@ void laser_fire(int intensity = 100.0) {
       #if LASER_INTENSITY_PIN == 8
         OCR4C = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
       #endif
-      digitalWrite(LASER_FIRING_PIN, LOW);
+      digitalWrite(LASER_FIRING_PIN, LASER_ARM);
     #endif
 
     if (laser.diagnostics) {
@@ -204,24 +225,46 @@ void laser_extinguish(){
     laser.firing = LASER_OFF;
 
     #if LASER_CONTROL == 1
-      #if LASER_FIRING_PIN == 2
-        OCR3B = 0;
-      #endif    
-      #if LASER_FIRING_PIN == 3
-        OCR3C = 0;
-      #endif    
-      #if LASER_FIRING_PIN == 5
-        OCR3A = 0;
-      #endif
-      #if LASER_FIRING_PIN == 6
-        OCR4A = 0;
-      #endif    
-      #if LASER_FIRING_PIN == 7
-        OCR4B = 0;
-      #endif    
-      #if LASER_FIRING_PIN == 8
-        OCR4C = 0;
-      #endif
+      #ifdef HIGH_TO_FIRE
+  	    #if LASER_FIRING_PIN == 2
+          OCR3B = 0;
+        #endif    
+        #if LASER_FIRING_PIN == 3
+          OCR3C = 0;
+        #endif    
+        #if LASER_FIRING_PIN == 5
+          OCR3A = 0;
+        #endif
+        #if LASER_FIRING_PIN == 6
+          OCR4A = 0;
+        #endif    
+        #if LASER_FIRING_PIN == 7
+          OCR4B = 0;
+        #endif    
+        #if LASER_FIRING_PIN == 8
+          OCR4C = 0;
+        #endif
+	  #else
+  	    #if LASER_FIRING_PIN == 2
+          OCR3B = labs(F_CPU / LASER_PWM);
+        #endif    
+        #if LASER_FIRING_PIN == 3
+          OCR3C = labs(F_CPU / LASER_PWM);
+        #endif    
+        #if LASER_FIRING_PIN == 5
+          OCR3A = labs(F_CPU / LASER_PWM);
+        #endif
+        #if LASER_FIRING_PIN == 6
+          OCR4A = labs(F_CPU / LASER_PWM);
+        #endif    
+        #if LASER_FIRING_PIN == 7
+          OCR4B = labs(F_CPU / LASER_PWM);
+        #endif    
+        #if LASER_FIRING_PIN == 8
+          OCR4C = labs(F_CPU / LASER_PWM);
+        #endif
+	  #endif
+	  
     #endif
 
     #if LASER_CONTROL == 2
@@ -243,7 +286,7 @@ void laser_extinguish(){
       #if LASER_INTENSITY_PIN == 8
         OCR4C = 0;
       #endif
-      digitalWrite(LASER_FIRING_PIN, HIGH);
+      digitalWrite(LASER_FIRING_PIN, LASER_UNARM);
     #endif
     
     laser.time += millis() - (laser.last_firing / 1000);
@@ -268,7 +311,8 @@ void laser_set_mode(int mode){
 }
 #ifdef LASER_PERIPHERALS
 bool laser_peripherals_ok(){
-  return true;
+	return true;
+//	return !digitalRead(LASER_PERIPHERALS_STATUS_PIN);
 }
 void laser_peripherals_on(){
   digitalWrite(LASER_COOLANT, LOW);
