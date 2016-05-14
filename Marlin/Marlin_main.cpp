@@ -64,6 +64,9 @@
 // G2  - CW ARC
 // G3  - CCW ARC
 // G4  - Dwell S<seconds> or P<milliseconds>
+// G7  - Execute Raster Mode
+//			L = Length
+//			$ = Direction [0/1]
 // G10 - retract filament according to settings of M207
 // G11 - retract recover filament according to settings of M208
 // G28 - Home all Axis
@@ -74,6 +77,15 @@
 // M Codes
 // M0   - Unconditional stop - Wait for user to press a button on the LCD (Only if ULTRA_LCD is enabled)
 // M1   - Same as M0
+
+// M3   - Fire Laser 
+//			S = Intensity (0 - 100 = 0% - 100%)
+//			L = Duration
+//			P = ppm
+//			D = Diagnostics [0/1]
+//			B = Laser Mode [0=Continus,1=pulse,2=raster]
+// M5   - Laser Off
+
 // M17  - Enable/Power all stepper motors
 // M18  - Disable all stepper motors; same as M84
 // M20  - List SD card
@@ -106,7 +118,7 @@
 //        Rxxx Wait for extruder current temp to reach target temp. Waits when heating and cooling
 // M114 - Output current position to serial port
 // M115 - Capabilities string
-// M117 - display message
+// M117 - display message (Shows any text on bottom line of LCD display)
 // M119 - Output Endstop status to serial port
 // M126 - Solenoid Air Valve Open (BariCUDA support by jmil)
 // M127 - Solenoid Air Valve Closed (BariCUDA vent to atmospheric pressure by jmil)
@@ -143,8 +155,17 @@
 // M503 - print the current settings (from memory not from eeprom)
 // M540 - Use S[0|1] to enable or disable the stop SD card print on endstop hit (requires ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED)
 // M600 - Pause for filament change X[pos] Y[pos] Z[relative lift] E[initial retract] L[later retract distance for removal]
-// M649 - 
-// M650 - 
+// M649 - Set Laser Options
+//			S = Laser Intensity
+//			L = Laser Duration
+//			P = ppm
+//			D = Diagnostics [0/1]
+//			B = Laser Mode [0=Continus,1=pulse,2=raster]
+//			R = Raster mm per pulse
+//			F = Feed Rate
+
+// M650 - set peel distance
+// M651 - Set peel move
 // M666 - set delta endstop adjustemnt
 // M605 - Set dual x-carriage movement mode: S<mode> [ X<duplication x-offset> R<duplication temp offset> ]
 // M907 - Set digital trimpot motor current using axis codes.
