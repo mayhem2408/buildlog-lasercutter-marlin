@@ -81,12 +81,15 @@
 //// The following define selects how to control the laser.  Please choose the one that matches your setup.
 // 1 = Single pin control - LOW when off, HIGH when on, PWM to adjust intensity
 // 2 = Two pin control - A firing pin for which LOW = off, HIGH = on, and a seperate intensity pin which carries a constant PWM signal and adjusts duty cycle to control intensity
-#define LASER_CONTROL 2
+#define LASER_CONTROL 1
+
+// Uncomment the following if your laser firing pin (not the PWM pin) for one or two pin control requires a HIGH signal to fire rather than a low (eg Red Sail M300 RS 3040)
+#define HIGH_TO_FIRE
 
 //// The following defines select which G codes tell the laser to fire.  It's OK to uncomment more than one.
 #define LASER_FIRE_G1 10 // fire the laser on a G1 move, extinguish when the move ends
 #define LASER_FIRE_SPINDLE 11 // fire the laser on M3, extinguish on M5
-#define LASER_FIRE_E 12 // fire the laser when the E axis moves
+//#define LASER_FIRE_E 12 // fire the laser when the E axis moves
 
 //// Raster mode enables the laser to etch bitmap data at high speeds.  Increases command buffer size substantially.
 #define LASER_RASTER
@@ -96,8 +99,8 @@
 
 //// Uncomment the following if the laser cutter is equipped with a peripheral relay board
 //// to control power to an exhaust fan, water pump, laser power supply, etc.
-#define LASER_PERIPHERALS
-#define LASER_PERIPHERALS_TIMEOUT 30000  // Number of milliseconds to wait for status signal from peripheral control board
+//#define LASER_PERIPHERALS
+//#define LASER_PERIPHERALS_TIMEOUT 30000  // Number of milliseconds to wait for status signal from peripheral control board
 
 //// Uncomment the following line to enable cubic bezier curve movement with the G5 code
 // #define G5_BEZIER
@@ -110,11 +113,39 @@
 // #define MUVE_Z_PEEL // The mUVe 1 uses a special peel maneuver between each layer, it requires independent control of each Z motor
 
 // Uncomment these options for the Buildlog.net laser cutter, and other similar models
-#define CUSTOM_MENDEL_NAME "Laser Cutter"
-#define LASER_WATTS 40.0
-#define LASER_DIAMETER 0.1 // milimeters
-#define LASER_PWM 25000 // hertz
+//#define CUSTOM_MENDEL_NAME "Laser Cutter"
+//#define LASER_WATTS 40.0
+//#define LASER_DIAMETER 0.1 // milimeters
+//#define LASER_PWM 25000 // hertz
+//#define LASER_FOCAL_HEIGHT 74.50 // z axis position at which the laser is focused
+
+// Uncomment these options for the K40 laser cutter, and other similar models
+//#define CUSTOM_MENDEL_NAME "K40 Laser"
+//#define LASER_WATTS 40.0
+//#define LASER_DIAMETER 0.1 // milimeters
+//#define LASER_PWM 50000 // hertz
+//#define LASER_FOCAL_HEIGHT 50 // z axis position at which the laser is focused
+
+// Uncomment these options for the All Things RC A5 laser Engraver, and other similar models
+#define CUSTOM_MENDEL_NAME "A5 Laser"
+#define LASER_WATTS 0.5
+#define LASER_DIAMETER 0.07 // milimeters
+#define LASER_PWM 8000 // hertz
 #define LASER_FOCAL_HEIGHT 74.50 // z axis position at which the laser is focused
+
+// Uncomment these options for the All Things RC A3 laser Engraver, and other similar models
+//#define CUSTOM_MENDEL_NAME "A3 Laser"
+//#define LASER_WATTS 2.0
+//#define LASER_DIAMETER 0.1 // milimeters
+//#define LASER_PWM 8000 // hertz
+//#define LASER_FOCAL_HEIGHT 74.50 // z axis position at which the laser is focused
+
+// Uncomment these options for the All Things RC Pocket laser Engraver, and other similar models
+//#define CUSTOM_MENDEL_NAME "Pocket Laser"
+//#define LASER_WATTS 0.5
+//#define LASER_DIAMETER 0.07 // milimeters
+//#define LASER_PWM 8000 // hertz
+//#define LASER_FOCAL_HEIGHT 74.50 // z axis position at which the laser is focused
 
 //===========================================================================
 //=============================Thermal Settings  ============================
@@ -298,7 +329,7 @@ const bool X_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 const bool Y_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
 const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
 #define DISABLE_MAX_ENDSTOPS
-//#define DISABLE_MIN_ENDSTOPS
+#define DISABLE_MIN_ENDSTOPS
 
 // Disable max endstops for compatibility with endstop checking routine
 #if defined(COREXY) && !defined(DISABLE_MAX_ENDSTOPS)
@@ -314,7 +345,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 // Disables axis when it's not being used.
 #define DISABLE_X false
 #define DISABLE_Y false
-#define DISABLE_Z true
+#define DISABLE_Z false
 #define DISABLE_E true // For all extruders
 
 // For Z-Axis with leadscrews, uncomment to save homeing status when disabling steppers (axis is unlikely to move on its own)
@@ -346,12 +377,12 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 //#define Z_MIN_POS 0
 
 // Lansing Makers Netowrk Laser Cutter
-#define X_MAX_POS 531
-#define X_MIN_POS 0
-#define Y_MAX_POS 558
-#define Y_MIN_POS 0
-#define Z_MAX_POS 95
-#define Z_MIN_POS 0
+//#define X_MAX_POS 531
+//#define X_MIN_POS 0
+//#define Y_MAX_POS 558
+//#define Y_MIN_POS 0
+//#define Z_MAX_POS 95
+//#define Z_MIN_POS 0
 
 // China Town K40 CO2 Laser Engraver/Cutter
 //#define X_MAX_POS 337
@@ -359,6 +390,30 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 //#define Y_MAX_POS 230
 //#define Y_MIN_POS 0
 //#define Z_MAX_POS 75
+//#define Z_MIN_POS 0
+
+// ATRC A3 Laser Engraver/Cutter
+#define X_MAX_POS 200
+#define X_MIN_POS 0
+#define Y_MAX_POS 150
+#define Y_MIN_POS 0
+#define Z_MAX_POS 50
+#define Z_MIN_POS 0
+
+// ATRC A3 Laser Engraver/Cutter
+//#define X_MAX_POS 405
+//#define X_MIN_POS 0
+//#define Y_MAX_POS 300
+//#define Y_MIN_POS 0
+//#define Z_MAX_POS 75
+//#define Z_MIN_POS 0
+
+// ATRC Pocket Laser Engraver
+//#define X_MAX_POS 37
+//#define X_MIN_POS 0
+//#define Y_MAX_POS 37
+//#define Y_MIN_POS 0
+//#define Z_MAX_POS 20
 //#define Z_MIN_POS 0
 
 #define X_MAX_LENGTH (X_MAX_POS - X_MIN_POS)
@@ -378,7 +433,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 
 //// MOVEMENT SETTINGS
 #define NUM_AXIS 4 // The axis order in all axis related arrays is X, Y, Z, E
-#define HOMING_FEEDRATE {3000, 3000, 240, 0}  // set the homing speeds (mm/min)
+#define HOMING_FEEDRATE {7600, 7600, 0, 0}  // set the homing speeds (mm/min)
 
 // default settings
 
@@ -390,12 +445,33 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 //#define DEFAULT_RETRACT_ACCELERATION  3000   // X, Y, Z and E max acceleration in mm/s^2 for r retracts
 
 // Lansing Makers Netowork Laser Cutter
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {157.4802,157.4802,6047.2440}  // default steps per unit for Ultimaker
-#define DEFAULT_MAX_FEEDRATE          {3000, 3000, 10, 25}    // (mm/sec)
-#define DEFAULT_MAX_ACCELERATION      {2600,2600,2.5,2.5}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
+//#define DEFAULT_AXIS_STEPS_PER_UNIT   {157.4802,157.4802,6047.2440}  // default steps per unit for Ultimaker
+//#define DEFAULT_MAX_FEEDRATE          {7600, 7600, 10, 25}    // (mm/sec)
+//#define DEFAULT_MAX_ACCELERATION      {2600,2600,2.5,2.5}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
 
+//#define DEFAULT_ACCELERATION          2000    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
+//#define DEFAULT_RETRACT_ACCELERATION  2000   // X, Y, Z and E max acceleration in mm/s^2 for retracts
+
+// ATRC A5 Laser Engraver/Cutter
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {80,80,106.66666666}  // default steps per unit for ATRC A3
+#define DEFAULT_MAX_FEEDRATE          {5000, 5000, 200, 25}    // (mm/sec)
+#define DEFAULT_MAX_ACCELERATION      {3000,3000,25,2.5}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
 #define DEFAULT_ACCELERATION          2000    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
 #define DEFAULT_RETRACT_ACCELERATION  2000   // X, Y, Z and E max acceleration in mm/s^2 for retracts
+
+// ATRC A3 Laser Engraver/Cutter
+//#define DEFAULT_AXIS_STEPS_PER_UNIT   {100,100,106.66666666}  // default steps per unit for ATRC A3
+//#define DEFAULT_MAX_FEEDRATE          {7600, 7600, 200, 25}    // (mm/sec)
+//#define DEFAULT_MAX_ACCELERATION      {2600,2600,25,2.5}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
+//#define DEFAULT_ACCELERATION          2000    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
+//#define DEFAULT_RETRACT_ACCELERATION  2000   // X, Y, Z and E max acceleration in mm/s^2 for retracts
+
+// ATRC Pocket Laser Engraver/Cutter
+//#define DEFAULT_AXIS_STEPS_PER_UNIT   {106.66666666,106.66666666,106.66666666}  // default steps per unit for ATRC Pocket
+//#define DEFAULT_MAX_FEEDRATE          {2000, 2000, 80, 25}    // (mm/sec)
+//#define DEFAULT_MAX_ACCELERATION      {400,400,2.5,2.5}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
+//#define DEFAULT_ACCELERATION          1000    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
+//#define DEFAULT_RETRACT_ACCELERATION  1000   // X, Y, Z and E max acceleration in mm/s^2 for retracts
 
 // Offset of the extruders (uncomment if using more than one and relying on firmware to position when changing).
 // The offset has to be X=0, Y=0 for the extruder 0 hotend (default extruder).
@@ -447,7 +523,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 
 // The RepRapDiscount Smart Controller (white PCB)
 // http://reprap.org/wiki/RepRapDiscount_Smart_Controller
-//#define REPRAP_DISCOUNT_SMART_CONTROLLER
+#define REPRAP_DISCOUNT_SMART_CONTROLLER
 
 // The GADGETS3D G3D LCD/SD Controller (blue PCB)
 // http://reprap.org/wiki/RAMPS_1.3/1.4_GADGETS3D_Shield_with_Panel
