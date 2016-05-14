@@ -110,7 +110,7 @@ void Config_PrintSettings()
     SERIAL_ECHOLN("");
 
     SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM("Maximum feedrates (mm/s):");
+    SERIAL_ECHOLNPGM("Maximum feedrates (mm per minute):");
     SERIAL_ECHO_START;
     SERIAL_ECHOPAIR("  M203 X",max_feedrate[0]);
     SERIAL_ECHOPAIR(" Y",max_feedrate[1] );
@@ -119,7 +119,7 @@ void Config_PrintSettings()
     SERIAL_ECHOLN("");
 
     SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM("Maximum Acceleration (mm/s2):");
+    SERIAL_ECHOLNPGM("Maximum Acceleration (mm/min2):");
     SERIAL_ECHO_START;
     SERIAL_ECHOPAIR("  M201 X" ,max_acceleration_units_per_sq_second[0] );
     SERIAL_ECHOPAIR(" Y" , max_acceleration_units_per_sq_second[1] );
