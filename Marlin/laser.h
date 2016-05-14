@@ -68,6 +68,14 @@ void laser_set_mode(int mode);
   void laser_wait_for_peripherals();
 #endif // LASER_PERIPHERALS
 
+#ifdef HIGH_TO_FIRE // Some cutters fire on high, some on low.
+  #define LASER_ARM HIGH
+  #define LASER_UNARM LOW
+#else
+  #define LASER_ARM LOW
+  #define LASER_UNARM HIGH
+#endif
+
 // Laser constants
 #define LASER_OFF 0
 #define LASER_ON 1
