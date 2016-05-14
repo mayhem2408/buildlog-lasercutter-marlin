@@ -146,6 +146,18 @@
   #define EXTRUDERS 1
 #endif
 
+// A single Y stepper driver is usually used to drive 2 stepper motors.
+// Uncomment this define to utilize a separate stepper driver for each Y axis motor.
+// Only a few motherboards support this, like RAMPS, which have dual extruder support (the 2nd, often unused, extruder driver is used
+// to control the 2nd Y axis stepper motor). The pins are currently only defined for a RAMPS motherboards.
+// On a RAMPS (or other 5 driver) motherboard, using this feature will limit you to using 1 extruder.
+#define Y_DUAL_STEPPER_DRIVERS
+
+#ifdef Y_DUAL_STEPPER_DRIVERS
+  #undef EXTRUDERS
+  #define EXTRUDERS 1
+#endif
+
 // Enable this for dual x-carriage printers. 
 // A dual x-carriage design has the advantage that the inactive extruder can be parked which
 // prevents hot-end ooze contaminating the print. It also reduces the weight of each x-carriage
@@ -211,10 +223,13 @@
 
 //default stepper release if idle
 // AMRI Laser cutter
-#define DEFAULT_STEPPER_DEACTIVE_TIME 30
+//#define DEFAULT_STEPPER_DEACTIVE_TIME 0
 
 // LMN Laser cutter
 //#define DEFAULT_STEPPER_DEACTIVE_TIME 30
+
+// All Things RC Laser Engravers
+#define DEFAULT_STEPPER_DEACTIVE_TIME 15
 
 #define DEFAULT_MINIMUMFEEDRATE       0.0     // minimum feedrate
 #define DEFAULT_MINTRAVELFEEDRATE     0.0
