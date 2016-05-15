@@ -28,70 +28,39 @@
 laser_t laser;
 
 void timer3_init(int pin) {
+	pinMode(pin, OUTPUT);
+    analogWrite(pin, 1);  // let Arduino setup do it's thing to the PWM pin
 
-  digitalWrite(pin, HIGH);
-  pinMode(pin, OUTPUT);
+    TCCR3B = 0x00;  // stop Timer4 clock for register updates
+    TCCR3A = 0x82; // Clear OC3A on match, fast PWM mode, lower WGM3x=14
+    ICR3 = labs(F_CPU / LASER_PWM); // clock cycles per PWM pulse
+    OCR3A = labs(F_CPU / LASER_PWM) - 1; // ICR3 - 1 force immediate compare on next tick
+    TCCR3B = 0x18 | 0x01; // upper WGM4x = 14, clock sel = prescaler, start running
 
-  // Setup timer3 to fast PWM with OC w/ ICR3 as TOP
-  noInterrupts();
-
-  TCCR3A = 0x00;  
-  TCCR3B = 0x00;  // stop Timer3 clock for register updates  
-  ICR3 = labs(F_CPU / LASER_PWM); // set clock cycles per PWM pulse (OC Top value)  
-
-  if (pin == 2) {
-    TCCR3A = _BV(COM3B1) | _BV(COM3B0) | _BV(WGM31); // Fast PWM (WGM31) / (Clear OC3B/pin 2 on compare match (set output to low level)
-    OCR3B = 0;
-  }
-
-  if (pin == 3) {
-    TCCR3A = _BV(COM3C1) | _BV(COM3C0) | _BV(WGM31); // Fast PWM (WGM31) / Clear OC3C/pin 3 on compare match (set output to low level)
-    OCR3C = 0;
-  }
-
-  if (pin == 5) {
-    TCCR3A = _BV(COM3A1) | _BV(COM3A0) | _BV(WGM31); // Fast PWM (WGM31) / Clear OC3A/pin 5 on compare match (set output to low level)
-    OCR3A = 0;
-  }
-
-  TCCR3B = _BV(CS30) | _BV(WGM33) |  _BV(WGM32); // Fast PWM / clkIo/1 (No prescaling) 
-
-  interrupts();
+    noInterrupts();
+    TCCR3B &= 0xf8; // stop timer, OC3A may be active now
+    TCNT3 = labs(F_CPU / LASER_PWM); // force immediate compare on next tick
+    ICR3 = labs(F_CPU / LASER_PWM); // set new PWM period
+    TCCR3B |= 0x01; // start the timer with proper prescaler value
+    interrupts();
 }
 
 void timer4_init(int pin) {
+	pinMode(pin, OUTPUT);
+    analogWrite(pin, 1);  // let Arduino setup do it's thing to the PWM pin
 
-  digitalWrite(pin, HIGH);
-  pinMode(pin, OUTPUT);
+    TCCR4B = 0x00;  // stop Timer4 clock for register updates
+    TCCR4A = 0x82; // Clear OC4A on match, fast PWM mode, lower WGM4x=14
+    ICR4 = labs(F_CPU / LASER_PWM); // clock cycles per PWM pulse
+    OCR4A = labs(F_CPU / LASER_PWM) - 1; // ICR4 - 1 force immediate compare on next tick
+    TCCR4B = 0x18 | 0x01; // upper WGM4x = 14, clock sel = prescaler, start running
 
-  // Setup timer4 to fast PWM with OC w/ ICR4 as TOP
-  noInterrupts();
-
-  TCCR4A = 0x00;  
-  TCCR4B = 0x00;  // stop Timer4 clock for register updates
-  TCCR4C = 0x00;
-  
-  ICR4 = labs(F_CPU / LASER_PWM); // set clock cycles per PWM pulse (OC Top value)  
-
-  if (pin == 6) {
-    TCCR4A = _BV(COM4A1) |  _BV(COM4A0) | _BV(WGM41); // Fast PWM (WGM41) / Clear OC4A/pin 5 on compare match (set output to low level)
-    OCR4A = 0;
-  }
-
-  if (pin == 7) {
-    TCCR4A = _BV(COM4B1) | _BV(COM4B0) | _BV(WGM41); // Fast PWM (WGM41) / (Clear OC4B/pin 2 on compare match (set output to low level)
-    OCR4B = 0;
-  }
-
-  if (pin == 8) {
-    TCCR4A = _BV(COM4C1) | _BV(COM4C0) | _BV(WGM41); // Fast PWM (WGM41) / Clear OC4C/pin 4 on compare match (set output to low level)
-    OCR4C = labs(F_CPU / LASER_PWM); // Set OCR4C to TOP value so it doesnt compare
-  }
-
-  TCCR4B = _BV(CS40) | _BV(WGM43) |  _BV(WGM42); // Fast PWM / clkIo/1 (No prescaling) 
-
-  interrupts();
-  
+    noInterrupts();
+    TCCR4B &= 0xf8; // stop timer, OC4A may be active now
+    TCNT4 = labs(F_CPU / LASER_PWM); // force immediate compare on next tick
+    ICR4 = labs(F_CPU / LASER_PWM); // set new PWM period
+    TCCR4B |= 0x01; // start the timer with proper prescaler value
+    interrupts();
 }
 
 void laser_init()
@@ -120,6 +89,9 @@ void laser_init()
     pinMode(LASER_EXHAUST, OUTPUT);
   #endif // LASER_PERIPHERALS
 
+  digitalWrite(LASER_FIRING_PIN, LASER_UNARM);  // Laser FIRING is active LOW, so preset the pin
+  pinMode(LASER_FIRING_PIN, OUTPUT);
+
   // initialize state to some sane defaults
   laser.intensity = 100.0;
   laser.ppm = 0.0;
@@ -140,174 +112,57 @@ void laser_init()
     laser.peel_speed = 2.0;
     laser.peel_pause = 0.0;
   #endif // MUVE_Z_PEEL
-
+  
   laser_extinguish();
 }
-void laser_fire(int intensity = 100.0) {
+void laser_fire(int intensity = 100.0){
+	laser.firing = LASER_ON;
+	laser.last_firing = micros(); // microseconds of last laser firing
+	if (intensity > 100.0) intensity = 100.0; // restrict intensity between 0 and 100
+	if (intensity < 0) intensity = 0;
 
-    laser.firing = LASER_ON;
-    laser.last_firing = micros(); // microseconds of last laser firing
-	
-    if (intensity > 100.0) intensity = 100.0; // restrict intensity between 0 and 100
-    if (intensity < 0) intensity = 0;
-
-    #if LASER_CONTROL == 1
+    pinMode(LASER_FIRING_PIN, OUTPUT);
+	#if LASER_CONTROL == 1
 	  #ifdef HIGH_TO_FIRE
-        #if LASER_FIRING_PIN == 2
-          OCR3B = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
-        #endif    
-        #if LASER_FIRING_PIN == 3
-          OCR3C = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
-        #endif    
-        #if LASER_FIRING_PIN == 5
-          OCR3A = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
-        #endif
-        #if LASER_FIRING_PIN == 6
-          OCR4A = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
-        #endif    
-        #if LASER_FIRING_PIN == 7
-          OCR4B = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
-        #endif    
-        #if LASER_FIRING_PIN == 8
-          OCR4C = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
-        #endif
-	  #else
-        #if LASER_FIRING_PIN == 2
-          OCR3B = labs(((100 - intensity) / 100.0)*(F_CPU / LASER_PWM));
-        #endif    
-        #if LASER_FIRING_PIN == 3
-          OCR3C = labs(((100 - intensity) / 100.0)*(F_CPU / LASER_PWM));
-        #endif    
-        #if LASER_FIRING_PIN == 5
-          OCR3A = labs(((100 - intensity) / 100.0)*(F_CPU / LASER_PWM));
-        #endif
-        #if LASER_FIRING_PIN == 6
-          OCR4A = labs(((100 - intensity) / 100.0)*(F_CPU / LASER_PWM));
-        #endif    
-        #if LASER_FIRING_PIN == 7
-          OCR4B = labs(((100 - intensity) / 100.0)*(F_CPU / LASER_PWM));
-        #endif    
-        #if LASER_FIRING_PIN == 8
-          OCR4C = labs(((100 - intensity) / 100.0)*(F_CPU / LASER_PWM));
-        #endif
-	  #endif	
+	      analogWrite(LASER_FIRING_PIN, labs((intensity / 100.0)*(F_CPU / LASER_PWM)));
+      #else
+        analogWrite(LASER_FIRING_PIN, labs(((100 - intensity) / 100.0)*(F_CPU / LASER_PWM)));
+      #endif
     #endif
-
-    #if LASER_CONTROL == 2
-      #if LASER_INTENSITY_PIN == 2
-        OCR3B = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
-      #endif    
-      #if LASER_INTENSITY_PIN == 3
-        OCR3C = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
-      #endif    
-      #if LASER_INTENSITY_PIN == 5
-        OCR3A = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
-      #endif
-      #if LASER_INTENSITY_PIN == 6
-        OCR4A = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
-      #endif    
-      #if LASER_INTENSITY_PIN == 7
-        OCR4B = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
-      #endif    
-      #if LASER_INTENSITY_PIN == 8
-        OCR4C = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
-      #endif
+	#if LASER_CONTROL == 2
+      analogWrite(LASER_INTENSITY_PIN, labs((intensity / 100.0)*(F_CPU / LASER_PWM)));
       digitalWrite(LASER_FIRING_PIN, LASER_ARM);
     #endif
 
     if (laser.diagnostics) {
-		SERIAL_ECHOLN("Laser fired");
-    }
+	  SERIAL_ECHOLN("Laser fired");
+	}
 }
-
 void laser_extinguish(){
-  if (laser.firing == LASER_ON) {
-    laser.firing = LASER_OFF;
+	if (laser.firing == LASER_ON) {
+	  laser.firing = LASER_OFF;
 
-    #if LASER_CONTROL == 1
-      #ifdef HIGH_TO_FIRE
-  	    #if LASER_FIRING_PIN == 2
-          OCR3B = 0;
-        #endif    
-        #if LASER_FIRING_PIN == 3
-          OCR3C = 0;
-        #endif    
-        #if LASER_FIRING_PIN == 5
-          OCR3A = 0;
-        #endif
-        #if LASER_FIRING_PIN == 6
-          OCR4A = 0;
-        #endif    
-        #if LASER_FIRING_PIN == 7
-          OCR4B = 0;
-        #endif    
-        #if LASER_FIRING_PIN == 8
-          OCR4C = 0;
-        #endif
-	  #else
-  	    #if LASER_FIRING_PIN == 2
-          OCR3B = labs(F_CPU / LASER_PWM);
-        #endif    
-        #if LASER_FIRING_PIN == 3
-          OCR3C = labs(F_CPU / LASER_PWM);
-        #endif    
-        #if LASER_FIRING_PIN == 5
-          OCR3A = labs(F_CPU / LASER_PWM);
-        #endif
-        #if LASER_FIRING_PIN == 6
-          OCR4A = labs(F_CPU / LASER_PWM);
-        #endif    
-        #if LASER_FIRING_PIN == 7
-          OCR4B = labs(F_CPU / LASER_PWM);
-        #endif    
-        #if LASER_FIRING_PIN == 8
-          OCR4C = labs(F_CPU / LASER_PWM);
-        #endif
-	  #endif
-	  
-    #endif
+	  // Engage the pullup resistor for TTL laser controllers which don't turn off entirely without it.
+	  digitalWrite(LASER_FIRING_PIN, LASER_UNARM);
+	  laser.time += millis() - (laser.last_firing / 1000);
 
-    #if LASER_CONTROL == 2
-      #if LASER_INTENSITY_PIN == 2
-        OCR3B = 0;
-      #endif    
-      #if LASER_INTENSITY_PIN == 3
-        OCR3C = 0;
-      #endif    
-      #if LASER_INTENSITY_PIN == 5
-        OCR3A = 0;
-      #endif
-      #if LASER_INTENSITY_PIN == 6
-        OCR4A = 0;
-      #endif    
-      #if LASER_INTENSITY_PIN == 7
-        OCR4B = 0;
-      #endif    
-      #if LASER_INTENSITY_PIN == 8
-        OCR4C = 0;
-      #endif
-      digitalWrite(LASER_FIRING_PIN, LASER_UNARM);
-    #endif
-    
-    laser.time += millis() - (laser.last_firing / 1000);
-
-    if (laser.diagnostics) {
-      SERIAL_ECHOLN("Laser extinguished");
-    }
-  }
+	  if (laser.diagnostics) {
+	    SERIAL_ECHOLN("Laser extinguished");
+	  }
+	}
 }
 void laser_set_mode(int mode){
-  switch(mode){
-    case 0:
-      laser.mode = CONTINUOUS;
-      return;
-    case 1:
-      laser.mode = PULSED;
-      return;
-    case 2:
-      laser.mode = RASTER;
-      return;
-  }
+	switch(mode){
+		case 0:
+		  laser.mode = CONTINUOUS;
+		  return;
+		case 1:
+		  laser.mode = PULSED;
+		  return;
+		case 2:
+		  laser.mode = RASTER;
+		  return;
+	}
 }
 #ifdef LASER_PERIPHERALS
 bool laser_peripherals_ok(){
@@ -341,20 +196,20 @@ void laser_peripherals_off(){
     }
 }
 void laser_wait_for_peripherals() {
-  unsigned long timeout = millis() + LASER_PERIPHERALS_TIMEOUT;
-  if (laser.diagnostics) {
-    SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM("Waiting for peripheral control board signal...");
-  }
-  while(!laser_peripherals_ok()) {
-    if (millis() > timeout) {
-      if (laser.diagnostics) {
-        SERIAL_ERROR_START;
-        SERIAL_ERRORLNPGM("Peripheral control board failed to respond");
-      }
-      Stop();
-      break;
-    }
-  }
+	unsigned long timeout = millis() + LASER_PERIPHERALS_TIMEOUT;
+	if (laser.diagnostics) {
+	  SERIAL_ECHO_START;
+	  SERIAL_ECHOLNPGM("Waiting for peripheral control board signal...");
+	}
+	while(!laser_peripherals_ok()) {
+		if (millis() > timeout) {
+			if (laser.diagnostics) {
+			  SERIAL_ERROR_START;
+			  SERIAL_ERRORLNPGM("Peripheral control board failed to respond");
+			}
+			Stop();
+			break;
+		}
+	}
 }
 #endif // LASER_PERIPHERALS
