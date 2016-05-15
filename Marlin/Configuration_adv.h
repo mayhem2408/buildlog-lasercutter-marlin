@@ -223,13 +223,10 @@
 
 //default stepper release if idle
 // AMRI Laser cutter
-//#define DEFAULT_STEPPER_DEACTIVE_TIME 0
+#define DEFAULT_STEPPER_DEACTIVE_TIME 0
 
 // LMN Laser cutter
 //#define DEFAULT_STEPPER_DEACTIVE_TIME 30
-
-// All Things RC Laser Engravers
-#define DEFAULT_STEPPER_DEACTIVE_TIME 15
 
 #define DEFAULT_MINIMUMFEEDRATE       0.0     // minimum feedrate
 #define DEFAULT_MINTRAVELFEEDRATE     0.0
