@@ -140,7 +140,7 @@ static void lcd_implementation_init()
 			u8g.setFont(u8g_font_5x8);
 			u8g.drawStr(62,48,"enhancements");
 			u8g.setFont(u8g_font_5x8);
-			u8g.drawStr(62,55,"by STB, MM");
+			u8g.drawStr(62,55,"by J.Revill");
 			u8g.drawStr(62,61,"uses u");
 			u8g.drawStr90(92,57,"8");
 			u8g.drawStr(100,61,"glib");
