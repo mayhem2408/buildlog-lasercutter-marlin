@@ -199,7 +199,7 @@ void laser_fire(int intensity = 100.0) {
           OCR3C = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
         #endif    
         #if LASER_FIRING_PIN == 5
-          OCR3A = labs(((100-intensity) / 100.0)*(F_CPU / LASER_PWM));
+          OCR3A = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
         #endif
         #if LASER_FIRING_PIN == 6
           OCR4A = labs((intensity / 100.0)*(F_CPU / LASER_PWM));
