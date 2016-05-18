@@ -264,6 +264,7 @@ static void lcd_sdcard_stop()
     card.sdprinting = false;
     card.closefile();
     quickStop();
+    enquecommand_P(PSTR("M649 L0 P0 B0 S100"));
     enquecommand_P(PSTR("M05"));
     if(SD_FINISHED_STEPPERRELEASE)
     {
@@ -799,7 +800,8 @@ static void action_laser_acc_off() {
 }
 
 static void action_laser_sight() {
-    enquecommand_P(PSTR("M03 S1"));
+    enquecommand_P(PSTR("M649 S1 B0 F2000"));
+    laser_fire(1);
 }
 
 static void action_laser_align_y() {
@@ -813,7 +815,8 @@ static void action_laser_align_x() {
 }
 
 static void action_laser_test_off() {
-    enquecommand_P(PSTR("M05"));
+    enquecommand_P(PSTR("M649 S0 B0 F2000"));
+    laser_extinguish();
 }
 
 static void action_laser_test_20_50ms() {

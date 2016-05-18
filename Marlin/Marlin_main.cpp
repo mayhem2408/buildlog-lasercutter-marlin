@@ -67,21 +67,22 @@
 // G7  - Execute Raster Mode
 //			L = Length
 //			$ = Direction [0/1]
+//      D = Data (base64 encoded with each character representing 4 Characters prepresents 3 Greyscale Pixels)
 // G10 - retract filament according to settings of M207
 // G11 - retract recover filament according to settings of M208
 // G28 - Home all Axis
 // G90 - Use Absolute Coordinates
 // G91 - Use Relative Coordinates
 // G92 - Set current position to cordinates given
+//			L = Duration
+//			P = ppm
 
 // M Codes
 // M0   - Unconditional stop - Wait for user to press a button on the LCD (Only if ULTRA_LCD is enabled)
 // M1   - Same as M0
 
 // M3   - Fire Laser 
-//			S = Intensity (0 - 100 = 0% - 100%)
-//			L = Duration
-//			P = ppm
+//     S = Intensity (0 - 100 = 0% - 100%)
 //			D = Diagnostics [0/1]
 //			B = Laser Mode [0=Continus,1=pulse,2=raster]
 // M5   - Laser Off
@@ -128,7 +129,7 @@
 // M190 - Sxxx Wait for bed current temp to reach target temp. Waits only when heating
 //        Rxxx Wait for bed current temp to reach target temp. Waits when heating and cooling
 // M200 - Set filament diameter
-// M201 - Set max acceleration in units/s^2 for print moves (M201 X1000 Y1000)
+// M201 - Set max acceleration in units/s^2 for print moves (M201 XF1000 Y1000)
 // M202 - Set max acceleration in units/s^2 for travel moves (M202 X1000 Y1000) Unused in Marlin!!
 // M203 - Set maximum feedrate that your machine can sustain (M203 X200 Y200 Z300 E10000) in mm/sec
 // M204 - Set default acceleration: S normal moves T filament only moves (M204 S3000 T7000) im mm/sec^2  also sets minimum segment time in ms (B20000) to prevent buffer underruns and M20 minimum feedrate
@@ -163,7 +164,6 @@
 //			B = Laser Mode [0=Continus,1=pulse,2=raster]
 //			R = Raster mm per pulse
 //			F = Feed Rate
-
 // M650 - set peel distance
 // M651 - Set peel move
 // M666 - set delta endstop adjustemnt
@@ -902,6 +902,16 @@ void process_commands()
     case 0: // G0
       if(Stopped == false) {
         get_coordinates(); // For X Y Z E F
+	
+	  // Brought in from Laukkas Code 2016-05-18	
+		#ifdef LASER_FIRE_G1
+		 laser.intensity = 0.0;
+         laser.duration = 0.0;
+         laser.ppm = 0.0;
+         laser.diagnostics = 0;
+         laser.status = LASER_OFF;
+		#endif // LASER_FIRE_G1
+	  // end of Laukkas code	
         prepare_move();
         //ClearToSend();
         return;
@@ -1099,7 +1109,11 @@ void process_commands()
       if (code_seen('L')) laser.raster_raw_length = int(code_value());
 	  if (code_seen('$')) {
 		laser.raster_direction = (bool)code_value();
-		destination[Y_AXIS] = current_position[Y_AXIS] + (laser.raster_mm_per_pulse * laser.raster_aspect_ratio); // increment Y axis
+    #ifdef LASER_RASTER_MANUAL_Y_FEED
+		  destination[Y_AXIS] = current_position[Y_AXIS]; // + (laser.raster_mm_per_pulse * laser.raster_aspect_ratio); // increment Y axis
+    #else
+      destination[Y_AXIS] = current_position[Y_AXIS] + (laser.raster_mm_per_pulse * laser.raster_aspect_ratio); // increment Y axis
+    #endif
 	  }
       if (code_seen('D')) laser.raster_num_pixels = base64_decode(laser.raster_data, &cmdbuffer[bufindr][strchr_pointer - cmdbuffer[bufindr] + 1], laser.raster_raw_length);
 	  if (!laser.raster_direction) {
