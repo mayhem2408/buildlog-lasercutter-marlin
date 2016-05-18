@@ -74,19 +74,17 @@
 // G90 - Use Absolute Coordinates
 // G91 - Use Relative Coordinates
 // G92 - Set current position to cordinates given
-//			L = Duration
-//			P = ppm
 
 // M Codes
 // M0   - Unconditional stop - Wait for user to press a button on the LCD (Only if ULTRA_LCD is enabled)
 // M1   - Same as M0
-
 // M3   - Fire Laser 
-//     S = Intensity (0 - 100 = 0% - 100%)
-//			D = Diagnostics [0/1]
-//			B = Laser Mode [0=Continus,1=pulse,2=raster]
+//           L = Duration
+//           P = ppm
+//           S = Intensity (0 - 100 = 0% - 100%)
+//           D = Diagnostics [0/1]
+//           B = Laser Mode [0=Continus,1=pulse,2=raster]
 // M5   - Laser Off
-
 // M17  - Enable/Power all stepper motors
 // M18  - Disable all stepper motors; same as M84
 // M20  - List SD card
@@ -129,7 +127,7 @@
 // M190 - Sxxx Wait for bed current temp to reach target temp. Waits only when heating
 //        Rxxx Wait for bed current temp to reach target temp. Waits when heating and cooling
 // M200 - Set filament diameter
-// M201 - Set max acceleration in units/s^2 for print moves (M201 XF1000 Y1000)
+// M201 - Set max acceleration in units/s^2 for print moves (M201 X1000 Y1000)
 // M202 - Set max acceleration in units/s^2 for travel moves (M202 X1000 Y1000) Unused in Marlin!!
 // M203 - Set maximum feedrate that your machine can sustain (M203 X200 Y200 Z300 E10000) in mm/sec
 // M204 - Set default acceleration: S normal moves T filament only moves (M204 S3000 T7000) im mm/sec^2  also sets minimum segment time in ms (B20000) to prevent buffer underruns and M20 minimum feedrate
@@ -903,15 +901,16 @@ void process_commands()
       if(Stopped == false) {
         get_coordinates(); // For X Y Z E F
 	
-	  // Brought in from Laukkas Code 2016-05-18	
-		#ifdef LASER_FIRE_G1
-		 laser.intensity = 0.0;
-         laser.duration = 0.0;
-         laser.ppm = 0.0;
-         laser.diagnostics = 0;
-         laser.status = LASER_OFF;
-		#endif // LASER_FIRE_G1
-	  // end of Laukkas code	
+        // Brought in from Laukkas Code 2016-05-18	
+        #ifdef LASER_FIRE_G1
+          laser.intensity = 0.0;
+          laser.duration = 0.0;
+          laser.ppm = 0.0;
+          laser.diagnostics = 0;
+          laser.status = LASER_OFF;
+        #endif // LASER_FIRE_G1
+        // end of Laukkas code	
+
         prepare_move();
         //ClearToSend();
         return;
@@ -1110,7 +1109,7 @@ void process_commands()
 	  if (code_seen('$')) {
 		laser.raster_direction = (bool)code_value();
     #ifdef LASER_RASTER_MANUAL_Y_FEED
-		  destination[Y_AXIS] = current_position[Y_AXIS]; // + (laser.raster_mm_per_pulse * laser.raster_aspect_ratio); // increment Y axis
+      destination[Y_AXIS] = current_position[Y_AXIS]; // Dont increment Y axis
     #else
       destination[Y_AXIS] = current_position[Y_AXIS] + (laser.raster_mm_per_pulse * laser.raster_aspect_ratio); // increment Y axis
     #endif
