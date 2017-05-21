@@ -57,7 +57,7 @@ typedef struct {
 extern laser_t laser;
 
 void laser_init();
-void laser_fire(int intensity);
+void laser_fire(float intensity);
 void laser_extinguish();
 void laser_update_lifetime();
 void laser_set_mode(int mode);

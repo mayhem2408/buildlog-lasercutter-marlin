@@ -264,7 +264,7 @@ static void lcd_sdcard_stop()
     card.sdprinting = false;
     card.closefile();
     quickStop();
-    enquecommand_P(PSTR("M649 L0 P0 B0 S100"));
+    enquecommand_P(PSTR("M649 L0 P0 B0 S0 D0"));
     enquecommand_P(PSTR("M05"));
     if(SD_FINISHED_STEPPERRELEASE)
     {
@@ -806,12 +806,12 @@ static void action_laser_sight() {
 
 static void action_laser_align_y() {
     enquecommand_P(PSTR("G28 Y"));
-    enquecommand_P(PSTR("G1 Y500 S20 P0.1 B1 L20"));
+    enquecommand_P(PSTR("G1 Y120 S1 P0.1 B1 L20"));
 }
 
 static void action_laser_align_x() {
     enquecommand_P(PSTR("G28 X"));
-    enquecommand_P(PSTR("G1 X500 S20 P0.1 B1 L20"));
+    enquecommand_P(PSTR("G1 X120 S1 P0.1 B1 L20"));
 }
 
 static void action_laser_test_off() {

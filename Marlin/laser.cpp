@@ -115,22 +115,22 @@ void laser_init()
   
   laser_extinguish();
 }
-void laser_fire(int intensity = 100.0){
+void laser_fire(float intensity = 100.0){
 	laser.firing = LASER_ON;
 	laser.last_firing = micros(); // microseconds of last laser firing
 	if (intensity > 100.0) intensity = 100.0; // restrict intensity between 0 and 100
-	if (intensity < 0) intensity = 0;
+	if (intensity < 0.0) intensity = 0.0;
 
     pinMode(LASER_FIRING_PIN, OUTPUT);
 	#if LASER_CONTROL == 1
 	  #ifdef HIGH_TO_FIRE
-	      analogWrite(LASER_FIRING_PIN, labs((intensity / 100.0)*(F_CPU / LASER_PWM)));
+	      analogWrite(LASER_FIRING_PIN, labs(((float)intensity / 100.0)*(F_CPU / LASER_PWM)));
       #else
-        analogWrite(LASER_FIRING_PIN, labs(((100 - intensity) / 100.0)*(F_CPU / LASER_PWM)));
+        analogWrite(LASER_FIRING_PIN, labs(((100.0 - (float)intensity) / 100.0)*(F_CPU / LASER_PWM)));
       #endif
     #endif
 	#if LASER_CONTROL == 2
-      analogWrite(LASER_INTENSITY_PIN, labs((intensity / 100.0)*(F_CPU / LASER_PWM)));
+      analogWrite(LASER_INTENSITY_PIN, labs(((float)intensity / 100.0)*(F_CPU / LASER_PWM)));
       digitalWrite(LASER_FIRING_PIN, LASER_ARM);
     #endif
 

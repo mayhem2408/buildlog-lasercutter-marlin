@@ -95,7 +95,7 @@
 #define LASER_RASTER
 #define LASER_MAX_RASTER_LINE 68 // maximum number of base64 encoded pixels per raster gcode command
 #define LASER_RASTER_ASPECT_RATIO 1 // pixels aren't square on most displays, 1.33 == 4:3 aspect ratio
-#define LASER_RASTER_MM_PER_PULSE 0.2 //Can be overridden by providing an R value in M649 command : M649 S17 B2 D0 R0.1 F4000
+#define LASER_RASTER_MM_PER_PULSE 0.1 //Can be overridden by providing an R value in M649 command : M649 S17 B2 D0 R0.1 F4000
 
 #define LASER_RASTER_MIN_POWER 0 // minimun power for laser at 7% when doing G7 Raster. This value use to be hardcoded in the planner.cpp
 #define LASER_RASTER_MANUAL_Y_FEED // Do not perform any Y movements on a G7 command. Manual Moves much be made between each line.
@@ -131,9 +131,9 @@
 
 // Uncomment these options for the All Things RC A5 laser Engraver, and other similar models
 #define CUSTOM_MENDEL_NAME "A5 Laser"
-#define LASER_WATTS 0.5
-#define LASER_DIAMETER 0.07 // milimeters
-#define LASER_PWM 8000 // hertz
+#define LASER_WATTS 5.0
+#define LASER_DIAMETER 0.1 // milimeters
+#define LASER_PWM 10000 // hertz
 #define LASER_FOCAL_HEIGHT 74.50 // z axis position at which the laser is focused
 
 // Uncomment these options for the All Things RC A3 laser Engraver, and other similar models
@@ -457,8 +457,8 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 
 // ATRC A5 Laser Engraver/Cutter
 #define DEFAULT_AXIS_STEPS_PER_UNIT   {80,80,106.66666666}  // default steps per unit for ATRC A3
-#define DEFAULT_MAX_FEEDRATE          {7600, 7600, 200, 25}    // (mm/sec)
-#define DEFAULT_MAX_ACCELERATION      {3000,3000,25,2.5}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
+#define DEFAULT_MAX_FEEDRATE          {6000, 6000, 200, 25}    // (mm/sec)
+#define DEFAULT_MAX_ACCELERATION      {3000, 3000, 25, 2.5}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
 #define DEFAULT_ACCELERATION          2000    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
 #define DEFAULT_RETRACT_ACCELERATION  2000   // X, Y, Z and E max acceleration in mm/s^2 for retracts
 

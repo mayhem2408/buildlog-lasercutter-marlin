@@ -66,7 +66,9 @@
 // G4  - Dwell S<seconds> or P<milliseconds>
 // G7  - Execute Raster Mode
 //			L = Length
-//			$ = Direction [0/1]
+//			$ = Direction 
+//        0 = Negative Horizontal, 1 = Positive Horizontal
+//        2 = Negative Vertial, 3 = Positive Vertical 
 //      D = Data (base64 encoded with each character representing 4 Characters prepresents 3 Greyscale Pixels)
 // G10 - retract filament according to settings of M207
 // G11 - retract recover filament according to settings of M208
@@ -141,6 +143,7 @@
 // M221 S<factor in percent>- set extrude factor override percentage
 // M240 - Trigger a camera to take a photograph
 // M250 - Set LCD contrast C<contrast value> (value 0..63)
+// M256 - Test Fire S<power> T<milliseconds>
 // M280 - set servo position absolute. P: servo index, S: angle or microseconds
 // M300 - Play beepsound S<frequency Hz> P<duration ms>
 // M301 - Set PID parameters P I and D
@@ -566,6 +569,7 @@ void get_command()
             return;
           }
 
+          /* --- CHECKSUM Validation --- */ 
           if(strchr(cmdbuffer[bufindw], '*') != NULL)
           {
             byte checksum = 0;
@@ -1147,20 +1151,20 @@ void process_commands()
             SERIAL_ECHOLN("Positive Vertical Raster Line");
           }
           break;
-      case 4: // Negative 45deg towards the origin
-        destination[X_AXIS] = current_position[X_AXIS] - ((laser.raster_mm_per_pulse * laser.raster_num_pixels)*0.7071);
-        destination[Y_AXIS] = current_position[Y_AXIS] - ((laser.raster_mm_per_pulse * laser.raster_num_pixels)*0.7071);
+      case 4: // Negative X Positive Y 45deg
+        destination[X_AXIS] = current_position[X_AXIS] - ((laser.raster_mm_per_pulse * laser.raster_num_pixels)*0.707106);
+        destination[Y_AXIS] = current_position[Y_AXIS] + ((laser.raster_mm_per_pulse * laser.raster_num_pixels)*0.707106);
         if (laser.diagnostics) {
             SERIAL_ECHO_START;
-            SERIAL_ECHOLN("Negative 45deg towards the origin Raster Line");
+            SERIAL_ECHOLN("Negative X Positive Y 45deg Raster Line");
           }
           break;
-      case 5: // Positive 45deg away from origin
-        destination[X_AXIS] = current_position[X_AXIS] + ((laser.raster_mm_per_pulse * laser.raster_num_pixels)*0.7071);
-        destination[Y_AXIS] = current_position[Y_AXIS] + ((laser.raster_mm_per_pulse * laser.raster_num_pixels)*0.7071);
+      case 5: // Positive X Negarite Y 45deg
+        destination[X_AXIS] = current_position[X_AXIS] + ((laser.raster_mm_per_pulse * laser.raster_num_pixels)*0.707106);
+        destination[Y_AXIS] = current_position[Y_AXIS] - ((laser.raster_mm_per_pulse * laser.raster_num_pixels)*0.707106);
         if (laser.diagnostics) {
             SERIAL_ECHO_START;
-            SERIAL_ECHOLN("Positive 45deg away from origin Raster Line");
+            SERIAL_ECHOLN("Positive X Negarite Y 45deg Raster Line");
           }
           break;
       default:
@@ -1855,10 +1859,10 @@ void process_commands()
       #endif
 	  break;
 
-    case 82:
+    case 82: // M82
       axis_relative_modes[3] = false;
       break;
-    case 83:
+    case 83: // M83
       axis_relative_modes[3] = true;
       break;
     case 18: //compatibility
@@ -2277,7 +2281,48 @@ void process_commands()
      }
     break;
 #endif
-    #ifdef PREVENT_DANGEROUS_EXTRUDE
+    case 256: // M256 - Test fire
+    {
+        codenum = 0;
+ 
+        if(code_seen('S'))
+        {
+            laser.intensity = (float) code_value();
+         }
+ 
+        if(code_seen('T'))
+        {
+             codenum = code_value();
+         }
+ 
+        //laser.diagnostics = 1;
+        laser_set_mode(0);
+ 
+        st_synchronize();
+        previous_millis_cmd = millis();
+ 
+        if(codenum > 0)
+        {
+/*            codenum += millis();  // keep track of when we started waiting
+            pinMode(LASER_FIRING_PIN, OUTPUT);
+            analogWrite(LASER_INTENSITY_PIN, labs((laser.intensity / 100.0) * (255.0)));
+            WRITE(LASER_FIRING_PIN, LOW);
+ 
+            while(millis()  < codenum)
+            {
+             // manage_inactivity();
+             }
+ 
+            laser.firing = LASER_ON; // here to trick the interrupt handler to not turn off the laser until its done
+            laser_extinguish();*/
+            laser_fire(laser.intensity);
+            delay(codenum);
+            laser_extinguish();
+
+         }
+     }
+     break;
+     #ifdef PREVENT_DANGEROUS_EXTRUDE
     case 302: // allow cold extrudes, or set the minimum extrude temperature
     {
 	  float temp = .0;
@@ -3059,16 +3104,16 @@ void manage_inactivity()
         disable_e1();
         disable_e2();
         #ifdef LASER
-          if (laser.time / 60000 > 0) {
-		laser.lifetime += laser.time / 60000; // convert to minutes
-		laser.time = 0;
-		Config_StoreSettings();
-	  }
-          laser_init();
-	#endif // LASER
-	#ifdef LASER_PERIPHERALS
+			if (laser.time / 60000 > 0) {
+		    	laser.lifetime += laser.time / 60000; // convert to minutes
+		    	laser.time = 0;
+		    	Config_StoreSettings();
+		  	}
+		  	laser_init();
+		#endif // LASER
+		#ifdef LASER_PERIPHERALS
             laser_peripherals_off();
-	#endif
+		#endif
       }
     }
   }
