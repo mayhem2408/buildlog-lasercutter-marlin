@@ -46,34 +46,145 @@ int base64_encode(char *output, char *input, int inputLen);
  */
 int base64_decode(unsigned char *output, char *input, int inputLen);
 
+/* base64_decode4bit:
+ *     Description:
+ *      Decode a base64 encoded string into bytes consisting of 4 bit (0-15) * 17 values.
+ *      Two input char is 3 output chars
+ *    Parameters:
+ *      output: the output buffer for the decoding,
+ *          stores the decoded binary
+ *      input: the input buffer for the decoding,
+ *           stores the base64 string to be decoded
+ *      inputLen: the length of the input buffer, in bytes
+ *    Return value:
+ *      Returns the length of the decoded string
+ *    Requirements:
+ *      1. output must not be null or empty
+ *      2. input must not be null
+ *      3. inputLen must be greater than or equal to 0
+ */
+
+//int base64_decode4bit(unsigned char *output, char *input, int inputLen);
+
+/* base64_decode2bit:
+ *     Description:
+ *      Decode a base64 encoded string into bytes consisting of 2 bit (0-3) * 85 values.
+ *      One input char is 3 output chars
+ *    Parameters:
+ *      output: the output buffer for the decoding,
+ *          stores the decoded binary
+ *      input: the input buffer for the decoding,
+ *           stores the base64 string to be decoded
+ *      inputLen: the length of the input buffer, in bytes
+ *    Return value:
+ *      Returns the length of the decoded string
+ *    Requirements:
+ *      1. output must not be null or empty
+ *      2. input must not be null
+ *      3. inputLen must be greater than or equal to 0
+ */
+
+//int base64_decode2bit(unsigned char *output, char *input, int inputLen);
+
+/* base64_decode1bit:
+ *     Description:
+ *      Decode a base64 encoded string into bytes consisting of 1 bit (0-1) * 255 values.
+ *      One input char is 6 output chars
+ *    Parameters:
+ *      output: the output buffer for the decoding,
+ *          stores the decoded binary
+ *      input: the input buffer for the decoding,
+ *           stores the base64 string to be decoded
+ *      inputLen: the length of the input buffer, in bytes
+ *    Return value:
+ *      Returns the length of the decoded string
+ *    Requirements:
+ *      1. output must not be null or empty
+ *      2. input must not be null
+ *      3. inputLen must be greater than or equal to 0
+ */
+
+//int base64_decode1bit(unsigned char *output, char *input, int inputLen);
+
 /* base64_enc_len:
- * 		Description:
- * 			Returns the length of a base64 encoded string whose decoded
- * 			form is inputLen bytes long
- * 		Parameters:
- * 			inputLen: the length of the decoded string
- * 		Return value:
- * 			The length of a base64 encoded string whose decoded form
- * 			is inputLen bytes long
- * 		Requirements:
- * 			None
+ *     Description:
+ *      Returns the length of a base64 encoded string whose decoded
+ *      form is inputLen bytes long
+ *    Parameters:
+ *      inputLen: the length of the decoded string
+ *    Return value:
+ *      The length of a base64 encoded string whose decoded form
+ *      is inputLen bytes long
+ *    Requirements:
+ *      None
  */
 int base64_enc_len(int inputLen);
 
 /* base64_dec_len:
- * 		Description:
- * 			Returns the length of the decoded form of a
- * 			base64 encoded string
- * 		Parameters:
- * 			input: the base64 encoded string to be measured
- * 			inputLen: the length of the base64 encoded string
- * 		Return value:
- * 			Returns the length of the decoded form of a
- * 			base64 encoded string
- * 		Requirements:
- * 			1. input must not be null
- * 			2. input must be greater than or equal to zero
+ *     Description:
+ *      Returns the length of the decoded form of a
+ *      base64 encoded string
+ *    Parameters:
+ *      input: the base64 encoded string to be measured
+ *      inputLen: the length of the base64 encoded string
+ *    Return value:
+ *      Returns the length of the decoded form of a
+ *      base64 encoded string
+ *    Requirements:
+ *      1. input must not be null
+ *      2. input must be greater than or equal to zero
  */
 int base64_dec_len(char *input, int inputLen);
+
+/* base64_dec_len4bit:
+ *     Description:
+ *      Returns the length of the decoded form of a
+ *      base64 encoded string
+ *    Parameters:
+ *      input: the base64 encoded string to be measured
+ *      inputLen: the length of the base64 encoded string
+ *    Return value:
+ *      Returns the length of the decoded form of a
+ *      base64 encoded string
+ *    Requirements:
+ *      1. input must not be null
+ *      2. input must be greater than or equal to zero
+ */
+
+//int base64_dec_len4bit(char *input, int inputLen);
+
+/* base64_dec_len2bit:
+ *     Description:
+ *      Returns the length of the decoded form of a
+ *      base64 encoded string
+ *    Parameters:
+ *      input: the base64 encoded string to be measured
+ *      inputLen: the length of the base64 encoded string
+ *    Return value:
+ *      Returns the length of the decoded form of a
+ *      base64 encoded string
+ *    Requirements:
+ *      1. input must not be null
+ *      2. input must be greater than or equal to zero
+ */
+
+//int base64_dec_len2bit(char *input, int inputLen);
+
+/* base64_dec_len1:
+ *     Description:
+ *      Returns the length of the decoded form of a
+ *      base64 encoded string
+ *    Parameters:
+ *      input: the base64 encoded string to be measured
+ *      inputLen: the length of the base64 encoded string
+ *    Return value:
+ *      Returns the length of the decoded form of a
+ *      base64 encoded string
+ *    Requirements:
+ *      1. input must not be null
+ *      2. input must be greater than or equal to zero
+ */
+
+//int base64_dec_len1bit(char *input, int inputLen);
 
 #endif // _BASE64_H

@@ -66,9 +66,10 @@
 // G4  - Dwell S<seconds> or P<milliseconds>
 // G7  - Execute Raster Mode
 //			L = Length
-//			$ = Direction 
+//			@ = Direction 
 //        0 = Negative Horizontal, 1 = Positive Horizontal
 //        2 = Negative Vertial, 3 = Positive Vertical 
+//        4 = 45 Deg +X-Y, 5= 45Deg -X+Y
 //      D = Data (base64 encoded with each character representing 4 Characters prepresents 3 Greyscale Pixels)
 // G10 - retract filament according to settings of M207
 // G11 - retract recover filament according to settings of M208
@@ -1110,15 +1111,37 @@ void process_commands()
     #ifdef LASER_RASTER
     case 7: //G7 Execute raster line
       if (code_seen('L')) laser.raster_raw_length = int(code_value());
-	  if (code_seen('$')) {
-		laser.raster_direction = (uint8_t)code_value();
-    #ifdef LASER_RASTER_MANUAL_Y_FEED
-      destination[Y_AXIS] = current_position[Y_AXIS]; // Dont increment Y axis
-    #else
-      destination[Y_AXIS] = current_position[Y_AXIS] + (laser.raster_mm_per_pulse * laser.raster_aspect_ratio); // increment Y axis
-    #endif
+
+      if (code_seen('$')) {
+        laser.raster_direction = (uint8_t)code_value(); //code_value_bool();
+        destination[Y_AXIS] = current_position[Y_AXIS] + (laser.raster_mm_per_pulse * laser.raster_aspect_ratio); // increment Y axis
+      }
+
+  	  if (code_seen('@')) {
+	  	laser.raster_direction = (uint8_t)code_value();
+      #ifdef LASER_RASTER_MANUAL_Y_FEED
+          destination[X_AXIS] = current_position[X_AXIS]; // Dont increment X axis
+          destination[Y_AXIS] = current_position[Y_AXIS]; // Dont increment Y axis
+      #else
+        switch(laser.raster_direction) {
+          case 0:
+          case 1:
+          case 4:
+            Kinematics.destination[Y_AXIS] = Kinematics.current_position[Y_AXIS] + (laser.raster_mm_per_pulse * laser.raster_aspect_ratio); // increment Y axis
+          break;    
+          case 2:
+          case 3:
+          case 5:
+            Kinematics.destination[X_AXIS] = Kinematics.current_position[X_AXIS] + (laser.raster_mm_per_pulse * laser.raster_aspect_ratio); // increment X axis
+          break;
+        }
+
+      #endif
 	  }
       if (code_seen('D')) laser.raster_num_pixels = base64_decode(laser.raster_data, &cmdbuffer[bufindr][strchr_pointer - cmdbuffer[bufindr] + 1], laser.raster_raw_length);
+      //if (code_seen('D')) laser.raster_num_pixels = base64_decode4bit(laser.raster_data, &cmdbuffer[bufindr][strchr_pointer - cmdbuffer[bufindr] + 1], laser.raster_raw_length);
+      //if (code_seen('D')) laser.raster_num_pixels = base64_decode2bit(laser.raster_data, &cmdbuffer[bufindr][strchr_pointer - cmdbuffer[bufindr] + 1], laser.raster_raw_length);
+      //if (code_seen('D')) laser.raster_num_pixels = base64_decode1bit(laser.raster_data, &cmdbuffer[bufindr][strchr_pointer - cmdbuffer[bufindr] + 1], laser.raster_raw_length);
 	  switch (laser.raster_direction) {
       case 0:
         destination[X_AXIS] = current_position[X_AXIS] - (laser.raster_mm_per_pulse * laser.raster_num_pixels);
@@ -1175,7 +1198,7 @@ void process_commands()
           break;
           
 	  }
-	  
+	  	  
 	  laser.ppm = 1 / laser.raster_mm_per_pulse; //number of pulses per millimetre
 	  laser.duration = (1000000 / ( feedrate / 60)) / laser.ppm; // (1 second in microseconds / (time to move 1mm in microseconds)) / (pulses per mm) = Duration of pulse, taking into account feedrate as speed and ppm
 	  

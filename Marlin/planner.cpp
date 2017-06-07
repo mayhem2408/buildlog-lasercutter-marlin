@@ -698,7 +698,9 @@ block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-positi
 			int OldRange, NewRange;
 			float NewValue;
 			OldRange = (255 - 0);
-			NewRange = (laser.rasterlaserpower - LASER_RASTER_MIN_POWER); //7% power on my unit outputs hardly any noticable burn at F3000 on paper, so adjust the raster contrast based off 7 being the lower. 7 still produces burns at slower feed rates, but getting less power than this isn't typically needed at slow feed rates.
+			// laser.rasterlaserpower is set with the M649 Sxxx command
+//			NewRange = (laser.rasterlaserpower - LASER_RASTER_MIN_POWER) * 2.55; //7% power on my unit outputs hardly any noticable burn at F3000 on paper, so adjust the raster contrast based off 7 being the lower. 7 still produces burns at slower feed rates, but getting less power than this isn't typically needed at slow feed rates.
+      NewRange = (laser.rasterlaserpower - LASER_RASTER_MIN_POWER); //7% power on my unit outputs hardly any noticable burn at F3000 on paper, so adjust the raster contrast based off 7 being the lower. 7 still produces burns at slower feed rates, but getting less power than this isn't typically needed at slow feed rates.
 			NewValue = (float)(((((float)laser.raster_data[i] - 0) * NewRange) / OldRange) + LASER_RASTER_MIN_POWER);
 			
 			//If less than 7%, turn off the laser tube.
@@ -706,6 +708,7 @@ block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-positi
 				NewValue = 0;
 			
             block->laser_raster_data[i] = NewValue; 
+//            block->laser_raster_data[i] = laser.raster_data[i]; 
         }
     } else {
         block->steps_l = 0;

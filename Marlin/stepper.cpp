@@ -689,7 +689,17 @@ ISR(TIMER1_COMPA_vect)
 			}
 			#ifdef LASER_RASTER
 			if (current_block->laser_mode == RASTER && current_block->laser_status == LASER_ON) { // Raster Firing Mode
+        // 2016-07-21 Moved data scaling from being store in the raster_data array to an inline caluculation
+        // This allows the raw data to remain at a resolution of 0-255
+        // My Diode laser responded between 19% and 33%. The old method rewrote of array with integer values between
+        // 19 and 33 leaving a resolution of only 14 steps. This method allows for 255 steps between 19% and 33%
+        //-----
 			  laser_fire(current_block->laser_raster_data[counter_raster]); //For some reason, when comparing raster power to ppm line burns the rasters were around 2% more powerful - going from darkened paper to burning through paper.
+
+        /*float NewValue;
+        NewValue = (float)(current_block->laser_raster_data[counter_raster] * (laser.rasterlaserpower - LASER_RASTER_MIN_POWER) / 255) + LASER_RASTER_MIN_POWER;
+        laser_fire(NewValue); //For some reason, when comparing raster power to ppm line burns the rasters were around 2% more powerful - going from darkened paper to burning through paper.
+        */
 			  if (laser.diagnostics) {
 			    SERIAL_ECHOPAIR("Pixel: ", (float)current_block->laser_raster_data[counter_raster]);
 		      }

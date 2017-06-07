@@ -1,19 +1,19 @@
-K40 Laser Arduino + Ramps Firmware
-==================================
-An example of this firmware in action : https://www.youtube.com/watch?v=6DKSxDIkqoA
+===================================================
+Modified Turnkey K40 Laser Arduino + Ramps Firmware
+===================================================
+An example of the original Turnkey firmware in action : https://www.youtube.com/watch?v=6DKSxDIkqoA
 
 Based off Marlin for 3D printers, for more info see https://github.com/MarlinFirmware/Marlin
-Original credits for building this firmware from stock Marlin go to THinkscape and Lansing Makers Network and John for help with raster support. 
+Original credits for building this firmware from stock Marlin go to The inkscape and Lansing Makers Network and John for help with raster support. 
 This firmware is based on their foundation work.
 
-This firmware is designed to be used in conjunction with the Inkscape 0.91 gcode exporter https://github.com/TurnkeyTyranny/laser-gcode-exporter-inkscape-plugin
-
-You can contact me via email at : 394ad2f@gmail.com, I check my email daily usually.
+This firmware is designed to be used in conjunction with my Inkscape 0.91 gcode exporter https://github.com/mayhem2408/laser-gcode-exporter-inkscape-plugin
 
 
 Safety Warnings
 ==================
 Ensure that the Power Supply 5v rail is connected to RAMPS I2C 5v pin and that the D1 diode is removed from the RAMPS board as shown in the wiring diagram. If this pin is not connected the laser will fire when you disconnect your ramps board from USB power.
+
 
 Wiring
 ==================
@@ -45,7 +45,7 @@ Install the arduino software IDE/toolset (Some configurations also work with 1.x
     The Arduino IDE will tell you when it has finished uploading.
 
 * Utilise my exporter with Inkscape to design your cuts and rasters
-    https://github.com/TurnkeyTyranny/laser-gcode-exporter-inkscape-plugin
+    https://github.com/mayhem2408/laser-gcode-exporter-inkscape-plugin
 
 * Burn your eyeballs out!
 

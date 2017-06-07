@@ -459,7 +459,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 #define DEFAULT_AXIS_STEPS_PER_UNIT   {80,80,106.66666666}  // default steps per unit for ATRC A3
 #define DEFAULT_MAX_FEEDRATE          {6000, 6000, 200, 25}    // (mm/sec)
 #define DEFAULT_MAX_ACCELERATION      {3000, 3000, 25, 2.5}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
-#define DEFAULT_ACCELERATION          2000    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
+#define DEFAULT_ACCELERATION          1000    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
 #define DEFAULT_RETRACT_ACCELERATION  2000   // X, Y, Z and E max acceleration in mm/s^2 for retracts
 
 // ATRC A3 Laser Engraver/Cutter
